@@ -1,4 +1,5 @@
 {
   "user_currencies": ["USD", "EUR"],
-  "user_stocks": ["SBERP", "GAZP", "LKOH", "PLZL", "YDEX"]
+  "user_stocks": ["SBERP", "GAZP", "LKOH", "PLZL", "YDEX"],
+  "user_simple_search": "Перевод"
 }

@@ -65,7 +65,7 @@ def open_excel(file_name: str, output_file: str = "df") -> List[Dict[str, Any]] 
                     "payment_amount": row.get("Сумма платежа"),
                     "payment_currency": row.get("Валюта платежа"),
                     "cashback": row.get("Кешбэк"),
-                    "category": row.get("Категория"),
+                    "category": str(row.get("Категория")),
                     "mss": row.get("MCC"),
                     "description": row.get("Описание"),
                     "bonuses": row.get("Бонусы (включая кэшбэк)"),
@@ -125,7 +125,7 @@ def request_tickers(file_name: str) -> str | List[Dict[str, Any]]:
 # print(json_data)
 
 
-def user_stocks_moex(file_name):
+def user_stocks_moex(file_name: str) -> List[Dict[str, Any]]:
     """
     Функция поиска котировок акций мосбиржи из запроса
     :param file_name: json запрос
