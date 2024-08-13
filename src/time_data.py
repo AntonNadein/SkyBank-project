@@ -1,13 +1,17 @@
 import datetime
+import logging
 
-# Доброе утро: От 6:00 до 12:00.
-# Добрый день: От 12:00 до 18:00.
-# Добрый вечер: От 18:00 до 22:00
-# После 22:00 - Доброй ночи.
+from src.logger import setup_logging
+
+setup_logging()
+greeting_by_time_logger = logging.getLogger("func.greeting_by_time")
+
 
 def greeting_by_time():
+    """Функция приветствия в зависимости от времени суток"""
     current_date_time = datetime.datetime.now()
     current_time = current_date_time.strftime("%H:%M")
+    greeting_by_time_logger.info(f"Текущее время {current_time}")
     if "06:00" <= str(current_time) < "12:00":
         return "Доброе утро"
     elif "12:00" <= str(current_time) < "18:00":
@@ -20,11 +24,7 @@ def greeting_by_time():
         return "Доброй ночи"
 
 
-di={}
-tm = greeting_by_time()
-di["greeting"] = tm
-print(di)
-
-
-
-
+# di={}
+# tm = greeting_by_time()
+# di["greeting"] = tm
+# print(di)
