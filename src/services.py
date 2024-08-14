@@ -1,10 +1,17 @@
 import json
+import logging
 import os
 import re
 from typing import Any, Dict, List
 
 from src.constant import PATH_TO_FILE
+from src.logger import setup_logging_services
 from src.utils import open_excel
+
+setup_logging_services()
+simple_search_logger = logging.getLogger("func.simple_search")
+phone_number_search_logger = logging.getLogger("func.phone_number_search")
+people_search_logger = logging.getLogger("func.people_search")
 
 
 def simple_search(file_dict: str, file_name: str) -> str | List[Dict[str, Any]]:
@@ -18,18 +25,20 @@ def simple_search(file_dict: str, file_name: str) -> str | List[Dict[str, Any]]:
     with open(os.path.join(PATH_TO_FILE, file_name), "r", encoding="utf-8") as file:
         parsed_data = json.load(file)
         str_search = parsed_data["user_simple_search"]
-    for serch in file_dict:
-        if (str_search).lower() in (serch["description"]).lower():
-            list_search.append(serch)
-        elif str_search.lower() in serch["category"].lower():
-            list_search.append(serch)
+        simple_search_logger.info(f"Запрос для поиска: {str_search}")
+    for search in file_dict:
+        if (str_search).lower() in (search["description"]).lower():
+            list_search.append(search)
+        elif str_search.lower() in search["category"].lower():
+            list_search.append(search)
+    simple_search_logger.info(f"Длина результатов поиска: {len(list_search)}")
     return json.dumps(list_search, ensure_ascii=False, indent=4)
 
 
 # "category": "Пополнения",Перевод с карты
 file_open = open_excel("operations.xlsx", output_file="list_dict")
-# json_answer = simple_search(file_open, 'user_settings.json')
-# print(json_answer)
+json_answer = simple_search(file_open, "user_settings.json")
+print(json_answer)
 
 
 def phone_number_search(file_dict: str) -> str | List[Dict[str, Any]]:
@@ -43,6 +52,7 @@ def phone_number_search(file_dict: str) -> str | List[Dict[str, Any]]:
     for search_num in file_dict:
         if re.search(pattern, search_num["description"]):
             list_search.append(search_num)
+    phone_number_search_logger.info(f"Длина результатов поиска: {len(list_search)}")
     return json.dumps(list_search, ensure_ascii=False, indent=4)
 
 
@@ -62,9 +72,10 @@ def people_search(file_dict: str) -> str | List[Dict[str, Any]]:
     for search_num in file_dict:
         if re.search(pattern, search_num["description"]) and "Переводы" in search_num["category"]:
             list_search.append(search_num)
+    people_search_logger.info(f"Длина результатов поиска: {len(list_search)}")
     return json.dumps(list_search, ensure_ascii=False, indent=4)
 
 
 # Ybrbnf Y.
-# json_answer_s = people_search(file_open)
-# print(json_answer_s)
+json_answer_s = people_search(file_open)
+print(json_answer_s)

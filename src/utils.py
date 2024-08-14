@@ -10,6 +10,7 @@ from pandas import DataFrame
 
 from src.constant import PATH_TO_FILE
 from src.logger import setup_logging
+from src.time_data import date_first_day_months
 
 load_dotenv()
 setup_logging()
@@ -160,51 +161,68 @@ def user_stocks_moex(file_name: str) -> List[Dict[str, Any]]:
 #         }]
 
 
-def card_info(data_frame: DataFrame) -> List[Dict[str, Any]]:
+def card_info(data_frame: DataFrame, date: str) -> List[Dict[str, Any]]:
     """Функция формированя отчета трат и кешбека по картам"""
     list_card_info = []
     list_cashback = []
-    df_filtered_status = data_frame[data_frame["status"] == "OK"]
+    date_start, date_end = date_first_day_months(date)
+    # фильр даты до начала месяца
+    df_filtered_data = data_frame.loc[
+        (pd.to_datetime(data_frame.transaction_date, dayfirst=True) <= date_start)
+        & (pd.to_datetime(data_frame.transaction_date, dayfirst=True) >= date_end)
+    ]
     # отсеять суммы меньше 100 рублей и посчитать кешбек
-    df_filtered_for_cashback = df_filtered_status[df_filtered_status["payment_amount"] < -100]
+    df_filtered_status = df_filtered_data[(df_filtered_data.status == "OK") & (df_filtered_data.payment_amount < -100)]
     # создаем индексы для значений payment_amount < 100
-    rows_to_update = df_filtered_for_cashback["payment_amount"] < -100
+    rows_to_update = df_filtered_status.payment_amount < -100
     # заменяем значения payment_amount / 100
-    df_filtered_for_cashback.loc[rows_to_update, "payment_amount"] = (
-        df_filtered_for_cashback.loc[rows_to_update, "payment_amount"] / 100
+    df_filtered_status.loc[rows_to_update, "payment_amount"] = (
+        df_filtered_status.loc[rows_to_update, "payment_amount"] / 100
     )
-    sum_cashback = df_filtered_for_cashback.groupby("last_digits").agg({"payment_amount": "sum"})
+    sum_cashback = df_filtered_status.groupby("last_digits").agg({"payment_amount": "sum"})
+    # Получаем список словарей с кэшбеком
     for index, row in sum_cashback.iterrows():
         dict_cashback = {"cashback": round(float(row.get("payment_amount")) * -1)}
         list_cashback.append(dict_cashback)
     card_info_logger.info(f"Список кешбека: {list_cashback}" f"Длинна списка: {len(list_cashback)} ")
+
     # отсеять и поссумировать пополнения (суммы больше 0 рублей)
-    df_filtered = df_filtered_status[df_filtered_status["payment_amount"] < 0]
+    df_filtered = df_filtered_data[(df_filtered_data.status == "OK") & (df_filtered_data.payment_amount < 0)]
     number_sum_cashback = df_filtered.groupby("last_digits").agg({"payment_amount": "sum"})
+    # Получаем список словарей с номером карты и тратами
     for index, row in number_sum_cashback.iterrows():
         dict_card = {
             "last_digits": index[1:],
-            "payment_amount": float(row.get("payment_amount") * -1),
+            "payment_amount": round(float(row.get("payment_amount") * -1), 2),
             "cashback": None,
         }
         list_card_info.append(dict_card)
     card_info_logger.info(f"Список карт и расходов: {list_card_info}" f"Длинна списка: {len(list_card_info)} ")
+
     # слияние списка словарей
     for i in range(len(list_card_info)):
         list_card_info[i].update(list_cashback[i])
     return list_card_info
 
 
-# print(card_info(fil))
+# fil = open_excel("operations.xlsx")
+# print(card_info(fil, "28.02.2021"))
 
 
-def top_transactions(data_frame: DataFrame) -> List[Dict[str, Any]]:
-    """Функция Топ-5 транзакций по сумме платежа по картам"""
+def top_transactions(data_frame: DataFrame, date) -> List[Dict[str, Any]]:
+    """Функция Топ-5 транзакций по сумме платежа"""
     transactions_dict = []
-    df_filtered_status = data_frame.loc[data_frame.status == "OK"]
-    df_filtered = df_filtered_status.loc[df_filtered_status.payment_amount < 0]
-    df_filtered_last_digits = df_filtered.loc[df_filtered_status.last_digits.notnull()]
-    sort_df_payment_amount = df_filtered_last_digits.sort_values(by=["payment_amount"])
+    date_start, first_day = date_first_day_months(date)
+    # Фильр успешность операции, платеж(отрицательные)
+    # Только операции с картами добавить & (data_frame.last_digits.notnull())
+    df_filtered = data_frame.loc[(data_frame.status == "OK") & (data_frame.payment_amount < 0)]
+    # Фильр от текущей даты до первого числа месяца
+    transactions_by_category_date = df_filtered.loc[
+        (pd.to_datetime(df_filtered["transaction_date"], dayfirst=True) <= date_start)
+        & (pd.to_datetime(df_filtered["transaction_date"], dayfirst=True) >= first_day)
+    ]
+    # Сортировка по платежу
+    sort_df_payment_amount = transactions_by_category_date.sort_values(by=["payment_amount"])
     top_transactions_logger.info("Сортировка произведена")
     for index, row in sort_df_payment_amount.iterrows():
         dict_card = {
@@ -218,4 +236,4 @@ def top_transactions(data_frame: DataFrame) -> List[Dict[str, Any]]:
 
 
 # fil = open_excel("operations.xlsx")
-# print(top_transactions(fil))
+# print(top_transactions(fil,"31.12.2021"))
