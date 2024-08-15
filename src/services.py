@@ -6,7 +6,6 @@ from typing import Any, Dict, List
 
 from src.constant import PATH_TO_FILE
 from src.logger import setup_logging_services
-from src.utils import open_excel
 
 setup_logging_services()
 simple_search_logger = logging.getLogger("func.simple_search")
@@ -35,12 +34,6 @@ def simple_search(file_dict: str, file_name: str) -> str | List[Dict[str, Any]]:
     return json.dumps(list_search, ensure_ascii=False, indent=4)
 
 
-# "category": "Пополнения",Перевод с карты
-file_open = open_excel("operations.xlsx", output_file="list_dict")
-json_answer = simple_search(file_open, "user_settings.json")
-print(json_answer)
-
-
 def phone_number_search(file_dict: str) -> str | List[Dict[str, Any]]:
     """
     Функция всех транзакций по номерам телефонов
@@ -56,11 +49,6 @@ def phone_number_search(file_dict: str) -> str | List[Dict[str, Any]]:
     return json.dumps(list_search, ensure_ascii=False, indent=4)
 
 
-# МТС Mobile +7 921 999-99-99   \b.+\b\s\S\d\s\d{3}\s\d{3}\W\d{2}\W\d{2}
-# json_answer_n = phone_number_search(file_open)
-# print(json_answer_n)
-
-
 def people_search(file_dict: str) -> str | List[Dict[str, Any]]:
     """
     Функция со всеми транзакциями, которые относятся к переводам физлицам
@@ -74,8 +62,3 @@ def people_search(file_dict: str) -> str | List[Dict[str, Any]]:
             list_search.append(search_num)
     people_search_logger.info(f"Длина результатов поиска: {len(list_search)}")
     return json.dumps(list_search, ensure_ascii=False, indent=4)
-
-
-# Ybrbnf Y.
-json_answer_s = people_search(file_open)
-print(json_answer_s)

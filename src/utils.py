@@ -79,12 +79,7 @@ def open_excel(file_name: str, output_file: str = "df") -> List[Dict[str, Any]] 
             return "Укажите тип файла вывода"
     except FileNotFoundError as e:
         open_excel_logger.error(f"Произошла ошибка: {e}")
-        return f"Файл не найден. Ошибка:{e}"
-
-
-# fil = open_excel("operations.xlsx")
-# print(type(fil[0]))
-# print(fil[0])
+        return "Файл не найден"
 
 
 def request_tickers(file_name: str) -> str | List[Dict[str, Any]]:
@@ -120,13 +115,7 @@ def request_tickers(file_name: str) -> str | List[Dict[str, Any]]:
         return list_dict
 
 
-# end_result = request_tickers(("user_settings.json"))
-# print(end_result)
-# json_data = json.dumps(end_result)
-# print(json_data)
-
-
-def user_stocks_moex(file_name: str) -> List[Dict[str, Any]]:
+def user_stocks_moex(file_name: str) -> List[Dict[str, Any]] | str:
     """
     Функция поиска котировок акций мосбиржи из запроса
     :param file_name: json запрос
@@ -141,6 +130,11 @@ def user_stocks_moex(file_name: str) -> List[Dict[str, Any]]:
     # Запрос на moex биржу
     url = "https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities.json"
     response = requests.get(url)
+
+    status_code = response.status_code
+    if status_code != 200:
+        return "Нет ответа"
+
     user_stocks_moex_logger.info(f"Результат ответа сайта: {response}")
     result = response.json()
     # Построение DataFrame для акций
@@ -153,12 +147,6 @@ def user_stocks_moex(file_name: str) -> List[Dict[str, Any]]:
         price_dict = {"stock": price, "price": float(df.loc[str(price), "WAPRICE"])}
         end_list.append(price_dict)
     return end_list
-
-
-# "stock_prices": [{
-#             "stock": "LKOH",
-#             "price": 6442.5
-#         }]
 
 
 def card_info(data_frame: DataFrame, date: str) -> List[Dict[str, Any]]:
@@ -205,10 +193,6 @@ def card_info(data_frame: DataFrame, date: str) -> List[Dict[str, Any]]:
     return list_card_info
 
 
-# fil = open_excel("operations.xlsx")
-# print(card_info(fil, "28.02.2021"))
-
-
 def top_transactions(data_frame: DataFrame, date) -> List[Dict[str, Any]]:
     """Функция Топ-5 транзакций по сумме платежа"""
     transactions_dict = []
@@ -233,7 +217,3 @@ def top_transactions(data_frame: DataFrame, date) -> List[Dict[str, Any]]:
         }
         transactions_dict.append(dict_card)
     return transactions_dict[:5]
-
-
-# fil = open_excel("operations.xlsx")
-# print(top_transactions(fil,"31.12.2021"))

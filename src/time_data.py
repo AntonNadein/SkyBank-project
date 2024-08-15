@@ -39,13 +39,6 @@ def datetime_to_time_date(file_name: str) -> tuple:
     return dates, times
 
 
-# dt_st, tims = datetime_to_time_date("user_settings.json")
-# print(dt_st)
-# print(tims)
-# print(type(dt_st))
-# print(type(tims))
-
-
 def greeting_by_time(times: str = None):
     """Функция приветствия в зависимости от времени суток"""
     if times is None:
@@ -66,9 +59,6 @@ def greeting_by_time(times: str = None):
         return "Доброй ночи"
 
 
-# print(greeting_by_time(tims))
-
-
 def date_first_day_months(today: Optional[str] = None) -> tuple:
     """
     Принимает дату в формате DD.MM.YYYY и возвращает первое число месяца
@@ -82,13 +72,6 @@ def date_first_day_months(today: Optional[str] = None) -> tuple:
     date_quarter = today.replace(day=1)
     date_first_day_months_logger.info(f"Возвращает: {today}, {date_quarter}")
     return today, date_quarter
-
-
-# dt_st, dtend = date_first_day_months("01.07.2014")
-# print(dt_st)
-# print(dtend)
-# print(type(dt_st))
-# print(type(dtend))
 
 
 def date_per_quarter(format_date: Optional[str] = None) -> tuple:
@@ -105,8 +88,3 @@ def date_per_quarter(format_date: Optional[str] = None) -> tuple:
     date_quarter = date - relativedelta(months=3)
     date_per_quarter_logger.info(f"Возвращает: {date}, {date_quarter}")
     return date, date_quarter
-
-
-# dt_st, dtend = date_per_quarter()
-# print(type(dt_st))
-# print(type(dtend))

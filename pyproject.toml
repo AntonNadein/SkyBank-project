@@ -11,6 +11,7 @@ requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 pandas = "^2.2.2"
 openpyxl = "^3.1.5"
+pytest = "^8.3.2"
 
 
 [tool.poetry.group.lint.dependencies]
@@ -23,6 +24,7 @@ isort = "^5.13.2"
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^5.0.0"
 pytest = "^8.3.2"
+freezegun = "^1.5.1"
 
 [build-system]
 requires = ["poetry-core"]

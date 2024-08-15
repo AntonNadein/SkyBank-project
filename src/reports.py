@@ -9,7 +9,6 @@ from pandas import DataFrame
 from src.constant import PATH_TO_FILE
 from src.logger import setup_logging_services_reports
 from src.time_data import date_per_quarter
-from src.utils import open_excel
 
 setup_logging_services_reports()
 spending_by_category_logger = logging.getLogger("app.home_page")
@@ -36,7 +35,7 @@ def save_to_file(file_name: str = "report") -> Callable:
     return my_decorator
 
 
-# @save_to_file('examp')
+# @save_to_file('example')
 def spending_by_category(transactions: pd.DataFrame, category: str, date: str) -> pd.DataFrame:
     """Фильтр трат по категории"""
     date_end, date_start = date_per_quarter(date)
@@ -52,10 +51,6 @@ def spending_by_category(transactions: pd.DataFrame, category: str, date: str) -
     return transactions_by_category_date
 
 
-# file_open = open_excel("operations.xlsx")
-#
-# end_df = spending_by_category(file_open,"Пополнения", "30.03.2020")
-# # print(type(end_df)) <class 'pandas.core.frame.DataFrame'>Супермаркеты  & (transactions.payment_amount < 0)
-# print((end_df).shape)
-# print((end_df).head())
-# print(end_df)
+# @save_to_file('test')
+def dataframe_to_json(df: pd.DataFrame) -> str:
+    return df.to_json(orient="records", indent=4, force_ascii=False)

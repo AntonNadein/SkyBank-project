@@ -3,7 +3,7 @@ import tempfile
 import pandas as pd
 from pandas._testing import assert_frame_equal
 
-from src.reports import save_to_file, spending_by_category
+from src.reports import dataframe_to_json, save_to_file, spending_by_category
 
 
 def test_spending_by_category_normal_df(data_fame_test):
@@ -89,3 +89,46 @@ def test_save_to_file_csv():
         csv_file = file.read()
 
     assert csv_file == "28.07.2018     Food -10\n29.07.2018 Clothing -20"
+
+
+def test_dataframe_to_json(test_category_data):
+    result = dataframe_to_json(test_category_data)
+    assert result == (
+        "[\n"
+        "    {\n"
+        '        "transaction_date":"28.07.2018",\n'
+        '        "category":"Food",\n'
+        '        "payment_amount":-100,\n'
+        '        "status":"FAILED",\n'
+        '        "payment_date":"28.07.2018"\n'
+        "    },\n"
+        "    {\n"
+        '        "transaction_date":"29.07.2018",\n'
+        '        "category":"Clothing",\n'
+        '        "payment_amount":-200,\n'
+        '        "status":"OK",\n'
+        '        "payment_date":"29.07.2018"\n'
+        "    },\n"
+        "    {\n"
+        '        "transaction_date":"30.07.2018",\n'
+        '        "category":"Clothing",\n'
+        '        "payment_amount":300,\n'
+        '        "status":"OK",\n'
+        '        "payment_date":"30.07.2018"\n'
+        "    },\n"
+        "    {\n"
+        '        "transaction_date":"30.04.2018",\n'
+        '        "category":"Clothing",\n'
+        '        "payment_amount":-400,\n'
+        '        "status":"OK",\n'
+        '        "payment_date":"30.04.2018"\n'
+        "    },\n"
+        "    {\n"
+        '        "transaction_date":"29.04.2018",\n'
+        '        "category":"Clothing",\n'
+        '        "payment_amount":-500,\n'
+        '        "status":"OK",\n'
+        '        "payment_date":"29.04.2018"\n'
+        "    }\n"
+        "]"
+    )
