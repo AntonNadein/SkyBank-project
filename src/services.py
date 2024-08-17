@@ -13,7 +13,7 @@ phone_number_search_logger = logging.getLogger("func.phone_number_search")
 people_search_logger = logging.getLogger("func.people_search")
 
 
-def simple_search(file_dict: str, file_name: str) -> str | List[Dict[str, Any]]:
+def simple_search(file_dict: Dict[str, Any], file_name: str) -> str | List[Dict[str, Any]]:
     """
     Функция простого поиска по описанию
     :param file_dict: list_dict из open_excel файла
@@ -34,7 +34,7 @@ def simple_search(file_dict: str, file_name: str) -> str | List[Dict[str, Any]]:
     return json.dumps(list_search, ensure_ascii=False, indent=4)
 
 
-def phone_number_search(file_dict: str) -> str | List[Dict[str, Any]]:
+def phone_number_search(file_dict: Dict[str, Any]) -> str | List[Dict[str, Any]]:
     """
     Функция всех транзакций по номерам телефонов
     :param file_dict: list_dict из open_excel файла
@@ -49,7 +49,7 @@ def phone_number_search(file_dict: str) -> str | List[Dict[str, Any]]:
     return json.dumps(list_search, ensure_ascii=False, indent=4)
 
 
-def people_search(file_dict: str) -> str | List[Dict[str, Any]]:
+def people_search(file_dict: Dict[str, Any]) -> str | List[Dict[str, Any]]:
     """
     Функция со всеми транзакциями, которые относятся к переводам физлицам
     :param file_dict: list_dict из open_excel файла
